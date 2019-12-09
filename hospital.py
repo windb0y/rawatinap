@@ -43,7 +43,8 @@ class Hospital(Resource):
         if row:
             return {'hospital': {'code': row[1], 'name': row[2], 'type': row[4], 'province': row[3], 'total_bed': row[5], 'used_bed': row[6], 'empty_bed': row[7], 'timestamp': row[8].strftime("%m/%d/%Y, %H:%M:%S")}}
         return {'message': 'hospital not found'}
-
+        
+    @jwt_required()
     def post(self, name):
         #if next(filter(lambda x: x['name'] == name, hospitals), None) is not None:
         #    return {'message': "A hospital with name '{}' already exists.".format(name)}
@@ -98,3 +99,21 @@ class HospitalList(Resource):
         connection.close
 
         return {'hospital': hospital}
+
+class BedList(Resource):
+    def get(self):
+        connection = mysql.connector.connect(host=HOST, database=DATABASE, user=USERNAME, passwd=PASSWORD)
+        cursor = connection.cursor()
+
+        query = "SELECT * FROM rumah_sakit WHERE tempat_tidur_total > tempat_tidur_isi"
+        cursor.execute(query)
+        data = cursor.fetchall()
+        hospital = []
+
+        for row in data:
+            hospital.append({'code': row[1], 'name': row[2], 'type': row[4], 'province': row[3], 'total_bed': row[5], 'used_bed': row[6], 'empty_bed': row[7], 'timestamp': row[8].strftime("%m/%d/%Y, %H:%M:%S")})
+
+        connection.close
+
+        return {'hospital': hospital}
+
