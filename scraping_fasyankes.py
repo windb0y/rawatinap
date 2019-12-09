@@ -1,9 +1,6 @@
-#A sample script to scrapedata from https://howpcrules.com/sample-page-for-web-scraping/ and saving it to a MySQL database. This tutorial was created for https://howpcrules.com/
-#The full tutorial is available at https://howpcrules.com/step-by-step-guide-on-scraping-data-from-a-website-and-saving-it-to-a-database/
-#Author: Amin Akbari, https://github.com/aminakbari/
 
 import requests
-import MySQLdb
+import mysql.connector
 from bs4 import BeautifulSoup
 
 #SQL connection data to connect and save the data in
@@ -41,40 +38,55 @@ dates_tables = soup.children
 #for row in dates_tables:
 #    print(row)
 #dataline = open(dates_tables)
+if dates_tables:
+    connection = mysql.connector.connect(host=HOST, database=DATABASE, user=USERNAME, passwd=PASSWORD)
+    kursor = connection.cursor()
+    query = "TRUNCATE rumah_sakit"
+    kursor.execute(query)
+    connection.commit()
+    connection.close()
 
+    for row in dates_tables:
+        cell = row.split('\n')
+        #print(cell)
+        for foo in cell:
+            if (len(foo) > 0):
+                line = foo.split('\t')    
+                kode = line[0].strip()        
+                provinsi = line[1].strip()
+                kode_rs = line[2].strip()
+                nama_rs = line[3].strip()
+                kepemilikan = line[4].strip()
+                tempat_tidur_total = line[5].strip()
+                tempat_tidur_isi = line[6].strip()
+                tempat_tidur_kosong = line[7].strip()
+                
 
-for row in dates_tables:
-    cell = row.split('\n')
-    #print(cell)
-    for foo in cell:
-        line = foo.split('\t')    
-        kode = line[0].strip()        
-        provinsi = line[1].strip()
-        kode_rs = line[2].strip()
-        nama_rs = line[3].strip()
-        kepemilikan = line[4].strip()
-        tempat_tidur_total = line[5].strip()
-        tempat_tidur_isi = line[6].strip()
-        tempat_tidur_kosong = line[7].strip()
-        
+                #Save event data to database
+                # Open database connection
+                db = mysql.connector.connect(host=HOST, database=DATABASE, user=USERNAME, passwd=PASSWORD)
+                # prepare a cursor object using cursor() method
+                cursor = db.cursor()
+                # Prepare SQL query to INSERT a record into the database.
+                sql = "INSERT INTO rumah_sakit(kode_rs, nama_rs, provinsi, kepemilikan, tempat_tidur_total, tempat_tidur_isi, tempat_tidur_kosong) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(kode_rs, nama_rs, provinsi, kepemilikan, tempat_tidur_total, tempat_tidur_isi, tempat_tidur_kosong)
+                try:
+                    # Execute the SQL command
+                    cursor.execute(sql)
+                    # Commit your changes in the database
+                    db.commit()
+                except:
+                    # Rollback in case there is any error
+                    db.rollback()
+                # disconnect from server
+                db.close()
 
-        #Save event data to database
-        # Open database connection
-        db = MySQLdb.connect(HOST, USERNAME, PASSWORD, DATABASE)
-        # prepare a cursor object using cursor() method
-        cursor = db.cursor()
-        # Prepare SQL query to INSERT a record into the database.
-        sql = "INSERT INTO rumah_sakit(kode_rs, nama_rs, provinsi, kepemilikan, tempat_tidur_total, tempat_tidur_isi, tempat_tidur_kosong) VALUES ('{}', '{}', '{}', '{}', '{}', '{}', '{}')".format(kode_rs, nama_rs, provinsi, kepemilikan, tempat_tidur_total, tempat_tidur_isi, tempat_tidur_kosong)
-        try:
-            # Execute the SQL command
-            cursor.execute(sql)
-            # Commit your changes in the database
-            db.commit()
-        except:
-            # Rollback in case there is any error
-            db.rollback()
-        # disconnect from server
-        db.close()
+connection = mysql.connector.connect(host=HOST, database=DATABASE, user=USERNAME, passwd=PASSWORD)
+kursor = connection.cursor()
+query = "DELETE FROM rumah_sakit WHERE id = 1"
+kursor.execute(query)
+connection.commit()
+connection.close()
+print("connection close")
     
     
 
