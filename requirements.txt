@@ -3,4 +3,5 @@ Flask-RESTful
 Flask-JWT
 mysql-connector-python
 beautifulsoup4
+requests
 uwsgi
