@@ -1,13 +1,14 @@
 
 import requests
+import psycopg2
 import mysql.connector
 from bs4 import BeautifulSoup
 
 #SQL connection data to connect and save the data in
 HOST = "localhost"
-USERNAME = "root"
-PASSWORD = ""
-DATABASE = "scraping_sample"
+USERNAME = "postgres"
+PASSWORD = "root"
+DATABASE = "rawatinap"
 
 
 #URL to be scraped
@@ -39,7 +40,7 @@ dates_tables = soup.children
 #    print(row)
 #dataline = open(dates_tables)
 if dates_tables:
-    connection = mysql.connector.connect(host=HOST, database=DATABASE, user=USERNAME, passwd=PASSWORD)
+    connection = psycopg2.connect(host=HOST, user=USERNAME, password=PASSWORD, dbname=DATABASE)
     kursor = connection.cursor()
     query = "TRUNCATE rumah_sakit"
     kursor.execute(query)
@@ -64,7 +65,7 @@ if dates_tables:
 
                 #Save event data to database
                 # Open database connection
-                db = mysql.connector.connect(host=HOST, database=DATABASE, user=USERNAME, passwd=PASSWORD)
+                db = psycopg2.connect(host=HOST, user=USERNAME, password=PASSWORD, dbname=DATABASE)
                 # prepare a cursor object using cursor() method
                 cursor = db.cursor()
                 # Prepare SQL query to INSERT a record into the database.
@@ -80,7 +81,8 @@ if dates_tables:
                 # disconnect from server
                 db.close()
 
-connection = mysql.connector.connect(host=HOST, database=DATABASE, user=USERNAME, passwd=PASSWORD)
+#connection = mysql.connector.connect(host=HOST, database=DATABASE, user=USERNAME, passwd=PASSWORD)
+connection = psycopg2.connect(host=HOST, user=USERNAME, password=PASSWORD, dbname=DATABASE)
 kursor = connection.cursor()
 query = "DELETE FROM rumah_sakit WHERE id = 1"
 kursor.execute(query)

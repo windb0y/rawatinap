@@ -1,12 +1,13 @@
+import psycopg2
 import mysql.connector
 from flask_restful import Resource, reqparse
 from flask_jwt import jwt_required
 
 #SQL connection data to connect and save the data in
-HOST = "localhost"
-USERNAME = "root"
-PASSWORD = ""
-DATABASE = "scraping_sample"
+HOST = "ec2-174-129-255-72.compute-1.amazonaws.com"
+USERNAME = "mhlrnhivjvoetu"
+PASSWORD = "ebdd3e33788bc7bce152f1aac9e207c41f418afb9e02e5638911d2799790adae"
+DATABASE = "d4h05h6uurju86"
 
 '''
 hospitals = [
@@ -32,7 +33,7 @@ class Hospital(Resource):
 
     @jwt_required()
     def get(self, name):
-        connection = mysql.connector.connect(host=HOST, database=DATABASE, user=USERNAME, passwd=PASSWORD)
+        connection = psycopg2.connect(host=HOST, user=USERNAME, password=PASSWORD, dbname=DATABASE)
         cursor = connection.cursor()
 
         query = "SELECT * FROM rumah_sakit WHERE nama_rs=%s"
@@ -53,7 +54,7 @@ class Hospital(Resource):
 
         hospital = {'name': name, 'total_bed': data['total_bed']}
         
-        connection = mysql.connector.connect(host=HOST, database=DATABASE, user=USERNAME, passwd=PASSWORD)
+        connection = psycopg2.connect(host=HOST, user=USERNAME, password=PASSWORD, dbname=DATABASE)
         cursor = connection.cursor()
 
         query = "INSERT INTO rumah_sakit (nama_rs, tempat_tidur_total) VALUES (%s, %s)"
@@ -85,7 +86,7 @@ class Hospital(Resource):
 
 class HospitalList(Resource):
     def get(self):
-        connection = mysql.connector.connect(host=HOST, database=DATABASE, user=USERNAME, passwd=PASSWORD)
+        connection = psycopg2.connect(host=HOST, user=USERNAME, password=PASSWORD, dbname=DATABASE)
         cursor = connection.cursor()
 
         query = "SELECT * FROM rumah_sakit"
@@ -102,7 +103,7 @@ class HospitalList(Resource):
 
 class BedList(Resource):
     def get(self):
-        connection = mysql.connector.connect(host=HOST, database=DATABASE, user=USERNAME, passwd=PASSWORD)
+        connection = psycopg2.connect(host=HOST, user=USERNAME, password=PASSWORD, dbname=DATABASE)
         cursor = connection.cursor()
 
         query = "SELECT * FROM rumah_sakit WHERE tempat_tidur_total > tempat_tidur_isi"
